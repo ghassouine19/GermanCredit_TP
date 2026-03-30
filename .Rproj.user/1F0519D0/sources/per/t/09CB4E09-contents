@@ -1,0 +1,54 @@
+#les trois grandes fammilles de l IA : IA numeric, symbolique, par optimisation
+#numeric= analyse de donnees en creant des modeles machine a laide de (Ia symbolique) regles logique et en optimisant les solutionsfinal (IA par optimisation)
+
+#categorie machine learning
+
+#pipline d apprentissage superviser page 6
+
+#les etapes d un algorithme de classification
+
+#le syntaxe complet de (partie entrainement et test)
+
+#matrice de confusion et mesure
+
+#R shainy ui
+
+############################################################
+
+install.packages("cluster")
+library(cluster)
+
+wss <- sapply(2:10, function(k) {
+  kmeans(data, centers = k, nstart = 10)$tot.withinss
+})
+
+plot(1:10, wss, type = "b",
+    xlab = "K", ylab = "inertie intra-class")      #il faut choisir le minimum
+
+#############################################################
+
+sil <- sapply(2:10, function(k) {
+  km <- kmeans(data, centers = k, nstart = 10)
+  mean(silhouette(km$cluster, dist(data))[,3])
+})
+
+plot(2:10, sil, type = "b",
+     xlab = "K", ylab = "Silhouette moyenne")     #il faut choisir le maximum 
+
+#############################################################
+
+fitness <- function(k, data){
+  - kmeans(data, centers = k, nstart = 20)$tot.withinss
+}
+
+ga_kmeans <- function(data){
+  population <- sample(2:10,20,replace = TRUE)
+  for (g in 1:50) {
+    scores <- sapply(population, fitness, data = data)
+    population <- population[order(scores, decreasing = TRUE)][1:10]
+    population <- c(population, population+sample(c(-1,1),10,TRUE))
+  }
+  population[which.max(sapply(population,fitness, data=data))]
+}
+
+
